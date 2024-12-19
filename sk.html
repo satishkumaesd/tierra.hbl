@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tierra Automation</title>
+  <style>
+    /* General styling */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fff; /* White background */
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header styling */
+    header {
+      background-color: #003366; /* Dark blue color */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header img {
+      max-width: 100px; /* Adjust the logo size */
+      margin-bottom: 10px;
+    }
+
+    /* Search bar styling */
+    #searchBar {
+      width: 100%;
+      max-width: 600px;
+      padding: 10px;
+      font-size: 16px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: block;
+    }
+
+    /* Results table styling */
+    table {
+      width: 100%;
+      max-width: 800px;
+      margin: 20px auto;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    table th, table td {
+      padding: 12px;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: #003366; /* Dark blue for header */
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    table tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    /* Footer styling */
+    footer {
+      text-align: center;
+      padding: 10px;
+      background-color: #003366;
+      color: white;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header with company name and logo -->
+  <header>
+    <img src="logo.png.png" >
+    <h1>Tierra Automation</h1>
+  </header>
+
+  <!-- Search bar -->
+  <input type="text" id="searchBar" placeholder="Search here..." />
+
+  <!-- Results table -->
+  <table id="resultsTable">
+    <thead>
+      <tr>
+        <th></th>
+        <th>S.No</th>
+        <th>Date</th>
+        <th>Clock Time</th>
+        <th>Plate Type</th>
+        <th>Terminal design</th>
+        <th>Model No</th>
+        <th>Batch No</th>
+        <th>Soaking period</th>
+        <th>Tub No</th>
+        <th>Circuit No</th>
+        <th>Room No</th>
+        <th>Operator ID</th>
+        <th>Mode</th>
+        <th>Hours</th>
+        <th>Step No</th>
+        <th>Step Duration</th>
+        <th>Step Amps</th>
+        <th>1</th>
+        <th>2</th>
+        <th>3</th>
+        <th>4</th>
+        <th>5</th>
+        <th>6</th>
+        <th>7</th>
+        <th>8</th>
+        <th>9</th>
+        <th>10</th>
+        <th>11</th>
+        <th>12</th>
+        <th>13</th>
+        <th>14</th>
+        <th>15</th>
+        <th>16</th>
+        <th>17</th>
+        <th>18</th>
+        <th>19</th>
+        <th>20</th>
+        <th>21</th>
+        <th>22</th>
+        <th>23</th>
+        <th>24</th>
+        <th>25</th>
+        <th>26</th>
+        <th>27</th>
+        <th>28</th>
+        <th>29</th>
+        <th>30</th>
+        <th>31</th>
+        <th>32</th>
+        <th>33</th>
+        <th>34</th>
+        <th>35</th>
+        <th>36</th>
+        <th>37</th>
+        <th>38</th>
+        <th>39</th>
+        <th>40</th>
+        <th>41</th>
+        <th>42</th>
+        <th>43</th>
+        <th>44</th>
+        <th>45</th>
+        <th>46</th>
+        <th>47</th>
+        <th>48</th>
+        <th>49</th>
+        <th>50</th>
+        <th>51</th>
+        <th>52</th>
+        <th>MIN (V)</th>
+        <th>MAX (V)</th>
+        <th>Ambient temperature</th>
+        <th>Tub water temperature</th>
+        <th>Cell temperature</th>
+      </tr>
+    </thead>
+    <tbody id="searchResults">
+      <!-- Search results will be inserted here -->
+    </tbody>
+  </table>
+
+  <footer>
+    <p>&copy; 2024 Tierra Automation</p>
+  </footer>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycby3zyLUtmSJc8_4Wa-3MDdUVsgmMqi6-OfWti4wv8aPBqd8EaJtZOdE4F3UqLAJ8r5WDg/exec';
+
+    fetch(API_URL)
+      .then(response => response.json())
+      .then(data => {
+        const sheetData = data.data;
+        initializeSearch(sheetData);
+      })
+      .catch(error => console.error('Error fetching data:', error));
+
+    function initializeSearch(data) {
+      const searchBar = document.getElementById('searchBar');
+      const resultsContainer = document.getElementById('searchResults');
+
+      searchBar.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase();
+        const filteredData = data.filter(row =>
+          row.some(cell => cell && cell.toString().toLowerCase().includes(query))
+        );
+
+        displayResults(filteredData, resultsContainer);
+      });
+
+      displayResults(data, resultsContainer);
+    }
+
+    function displayResults(results, container) {
+      container.innerHTML = results
+        .map(row => {
+          // Format only specific columns
+          row[2] = formatDate(row[2]); // Date column (index 2)
+          row[3] = formatTime(row[3]); // Time column (index 3)
+
+          return `<tr>${row.map(cell => `<td>${sanitizeCell(cell)}</td>`).join('')}</tr>`;
+        })
+        .join('');
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return 'Invalid Date';
+      if (dateString.includes('T')) {
+        const date = new Date(Date.parse(dateString));
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+      return dateString; // Return as-is if not ISO format
+    }
+
+    function formatTime(timeString) {
+      if (!timeString) return 'Invalid Time';
+      if (timeString.includes('T')) {
+        const date = new Date(Date.parse(timeString));
+        return date.toLocaleTimeString('en-US', { hour12: true });
+      }
+      return timeString; // Return as-is if not ISO format
+    }
+
+    function sanitizeCell(cell) {
+      return cell ? cell : ''; // Ensure no undefined or null values break the table
+    }
+  </script>
+
+</body>
+</html>
